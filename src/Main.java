@@ -16,6 +16,8 @@ class Items {
 }
 
 class ValidateItem {
+
+    // Validates all item details
     public static void validateItem(Items item, HashMap<String, ArrayList<Type>> itemMapWithType) {
         validateName(item.name);
         validatePrice(item.price);
@@ -24,35 +26,35 @@ class ValidateItem {
         validateDuplicacy(itemMapWithType, item.name, item.type);
     }
 
+    // Validates item name
     public static void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Item name cannot be empty");
         }
     }
 
+    // Validates item price
     public static void validatePrice(double price) {
         if (price <= 0) {
             throw new IllegalArgumentException("Price must be greater than 0");
         }
     }
 
+    // Validates item quantity
     public static void validateQuantity(int qty) {
         if (qty <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
     }
 
-    public static void validateDuplicacy(
-            HashMap<String, ArrayList<Type>> itemMapWithType,
-            String name,
-            Type type) {
-
-        if (itemMapWithType.containsKey(name)
-                && itemMapWithType.get(name).contains(type)) {
+    // Checks for duplicate items
+    public static void validateDuplicacy(HashMap<String, ArrayList<Type>> itemMapWithType, String name, Type type) {
+        if (itemMapWithType.containsKey(name) && itemMapWithType.get(name).contains(type)) {
             throw new IllegalArgumentException("Same item already exists in DB");
         }
     }
 
+    // Validates item type
     public static void validateType(Type type) {
         if (type == null) {
             throw new IllegalArgumentException("Item type cannot be null");
@@ -65,16 +67,22 @@ interface TaxCalculation {
 }
 
 class RawTaxCalculation implements TaxCalculation {
+
     @Override
     public double getTaxCalculate(double totalPrice) {
+        // Raw item tax is 12.5%
         return totalPrice * 0.125;
     }
 }
 
 class ManufactureTaxCalculation implements TaxCalculation {
+
     @Override
     public double getTaxCalculate(double totalPrice) {
+        // Calculate basic tax
         double basicTax = totalPrice * 0.125;
+
+        // Calculate additional tax
         double additionalTax = (totalPrice + basicTax) * 0.02;
 
         return basicTax + additionalTax;
@@ -82,12 +90,15 @@ class ManufactureTaxCalculation implements TaxCalculation {
 }
 
 class ImportedTaxCalculation implements TaxCalculation {
+
     @Override
     public double getTaxCalculate(double totalPrice) {
+        // Calculate import duty
         double importDuty = totalPrice * 0.10;
         double finalCost = totalPrice + importDuty;
         double surcharge;
 
+        // Calculate surcharge based on final cost
         if (finalCost <= 100) {
             surcharge = 5;
         } else if (finalCost <= 200) {
@@ -101,9 +112,11 @@ class ImportedTaxCalculation implements TaxCalculation {
 }
 
 class CalculateTaxOfItem {
+
     public static double[] calculateTaxOfItem(Items item) {
         TaxCalculation taxCalculation;
 
+        // Select tax calculation based on item type
         switch (item.type) {
             case Raw:
                 taxCalculation = new RawTaxCalculation();
@@ -121,7 +134,10 @@ class CalculateTaxOfItem {
                 throw new IllegalArgumentException("Invalid item type");
         }
 
+        // Calculate total price
         double totalPrice = item.price * item.quantity;
+
+        // Calculate tax and final price
         double tax = taxCalculation.getTaxCalculate(totalPrice);
         double finalPrice = totalPrice + tax;
 
@@ -130,38 +146,47 @@ class CalculateTaxOfItem {
 }
 
 public class Main {
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+
+        // Stores valid items
         ArrayList<Items> items = new ArrayList<>();
+
+        // Stores item names and types for duplicate checking
         HashMap<String, ArrayList<Type>> itemMapWithType = new HashMap<>();
 
         while (true) {
             System.out.print("Do you want to enter details of any item (y/n): ");
             String response = sc.next().toLowerCase();
 
+            // Exit the program
             if (response.equals("n") || response.equals("no")) {
                 break;
             }
 
+            // Validate yes/no response
             if (!response.equals("y") && !response.equals("yes")) {
                 System.out.println("Invalid response. Please enter y or n.");
                 continue;
             }
 
             try {
+                // Read and validate item details
                 Items item = readItem(sc, itemMapWithType);
                 items.add(item);
 
-                itemMapWithType
-                        .computeIfAbsent(item.name, k -> new ArrayList<>())
-                        .add(item.type);
+                // Store item details for duplicate checking
+                itemMapWithType.computeIfAbsent(item.name, k -> new ArrayList<>()).add(item.type);
 
                 System.out.println("Item details accepted successfully.");
+
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid input: " + e.getMessage());
             }
         }
 
+        // Display all valid items
         for (int i = 0; i < items.size(); i++) {
             Items item = items.get(i);
             double[] prices = CalculateTaxOfItem.calculateTaxOfItem(item);
@@ -173,10 +198,8 @@ public class Main {
         sc.close();
     }
 
-    public static Items readItem(
-            Scanner sc,
-            HashMap<String, ArrayList<Type>> itemMapWithType) {
-
+    // Reads item details from the user
+    public static Items readItem(Scanner sc, HashMap<String, ArrayList<Type>> itemMapWithType) {
         System.out.print("Enter item name: ");
         String name = sc.next();
 
@@ -195,6 +218,7 @@ public class Main {
         item.quantity = qty;
 
         try {
+            // Convert input type to lowercase
             String formattedType = type.trim().toLowerCase();
 
             switch (formattedType) {
@@ -213,20 +237,19 @@ public class Main {
                 default:
                     throw new IllegalArgumentException("Invalid item type");
             }
+
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid item type");
         }
 
+        // Validate the complete item
         ValidateItem.validateItem(item, itemMapWithType);
 
         return item;
     }
 
-    public static void display(
-            Items item,
-            double[] price,
-            double totalPrice) {
-
+    // Displays item details
+    public static void display(Items item, double[] price, double totalPrice) {
         double tax = price[0];
         double finalPrice = price[1];
 
