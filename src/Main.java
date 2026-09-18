@@ -195,10 +195,24 @@ public class Main {
         item.quantity = qty;
 
         try {
-            item.type = Type.valueOf(
-                    type.substring(0, 1).toUpperCase()
-                            + type.substring(1).toLowerCase()
-            );
+            String formattedType = type.trim().toLowerCase();
+
+            switch (formattedType) {
+                case "raw":
+                    item.type = Type.Raw;
+                    break;
+
+                case "manufactured":
+                    item.type = Type.Manufactured;
+                    break;
+
+                case "imported":
+                    item.type = Type.Imported;
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Invalid item type");
+            }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid item type");
         }
