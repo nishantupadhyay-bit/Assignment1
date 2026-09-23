@@ -1,6 +1,5 @@
 package tax;
 
-import enums.Type;
 import item.Items;
 
 public class CalculateTaxOfItem {

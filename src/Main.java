@@ -41,7 +41,6 @@ public class Main {
         for (Items item : items) {
             double[] prices = CalculateTaxOfItem.calculateTaxOfItem(item);
             double totalPrice = item.getPrice() * item.getQuantity();
-
             ItemDisplay.display(item, prices, totalPrice);
         }
 

@@ -25,27 +25,23 @@ public class ItemInput {
         System.out.print("Enter item type (raw/manufactured/imported): ");
         String type = sc.next();
 
-        Items item = new Items();
-        item.setName(name);
-        item.setPrice(price);
-        item.setQuantity(quantity);
+        Type itemType;
 
-        String formattedType = type.trim().toLowerCase();
-
-        switch (formattedType) {
+        switch (type.trim().toLowerCase()) {
             case "raw":
-                item.setType(Type.Raw);
+                itemType = Type.Raw;
                 break;
             case "manufactured":
-                item.setType(Type.Manufactured);
+                itemType = Type.Manufactured;
                 break;
             case "imported":
-                item.setType(Type.Imported);
+                itemType = Type.Imported;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid item type");
         }
 
+        Items item = new Items(name, price, quantity, itemType);
         ValidateItem.validateItem(item, itemMapWithType);
 
         return item;

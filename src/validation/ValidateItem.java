@@ -15,10 +15,6 @@ public class ValidateItem {
         ValidatePrice.validate(item.getPrice());
         ValidateQuantity.validate(item.getQuantity());
         ValidateType.validate(item.getType());
-        ValidateDuplicacy.validate(
-                itemMapWithType,
-                item.getName(),
-                item.getType()
-        );
+        ValidateDuplicacy.validate(itemMapWithType, item.getName(), item.getType());
     }
 }

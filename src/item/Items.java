@@ -8,6 +8,13 @@ public class Items {
     private int quantity;
     private Type type;
 
+    public Items(String name, double price, int quantity, Type type) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
